@@ -1,0 +1,110 @@
+# ML Training Pipeline
+
+This directory contains the machine learning training workflow.
+
+## Directory Structure
+
+```
+training/
+├── dataset/                # Datasets for training
+├── preprocessing.py        # Data preprocessing
+├── train.py               # Model training
+├── evaluate.py            # Model evaluation
+└── README.md              # This file
+```
+
+## Workflow TO BE IMPLEMENTED
+
+### 1. Data Preparation
+- Load raw datasets from `dataset/` directory
+- Explore and understand data patterns
+- Handle missing values and outliers
+- Apply data cleaning
+
+### 2. Feature Engineering
+- Extract meaningful features from raw data
+- Normalize/scale numerical features
+- Encode categorical variables
+- Select relevant features
+
+### 3. Train/Test Split
+- Split data into training/validation/test sets
+- Ensure proper stratification
+- Apply appropriate cross-validation strategy
+
+### 4. Model Training
+- Select appropriate algorithm (classification vs regression)
+- Initialize model with hyperparameters
+- Train on training set
+- Monitor training progress
+
+### 5. Hyperparameter Tuning
+- Grid search or random search for optimal parameters
+- Evaluate different parameter combinations
+- Select best performing parameters
+
+### 6. Model Evaluation
+- Evaluate on test set
+- Calculate performance metrics
+- Generate classification/regression reports
+- Compare with baseline models
+
+### 7. Model Serialization
+- Save trained model to `trained_models/` directory
+- Save fitted preprocessors (scaler, encoder)
+- Document model version and performance
+
+## Files Structure
+
+### preprocessing.py
+- `load_dataset()`: Load training data
+- `clean_data()`: Handle missing values, duplicates
+- `extract_features()`: Feature engineering
+- `preprocess_data()`: Apply transformations
+- `split_data()`: Train/test split
+
+### train.py
+- `train_model()`: Train ML model
+- `tune_hyperparameters()`: Hyperparameter optimization
+- `cross_validate()`: K-fold cross validation
+- `save_model()`: Serialize model
+- `load_model()`: Deserialize model
+
+### evaluate.py
+- `evaluate_classification()`: Classification metrics
+- `evaluate_regression()`: Regression metrics
+- `get_feature_importance()`: Feature importance
+- `generate_classification_report()`: Detailed report
+- `plot_confusion_matrix()`: Visualization
+- `plot_roc_curve()`: ROC curve visualization
+
+## Running the Training Pipeline
+
+```bash
+cd ml-service
+
+# Activate virtual environment
+python -m venv .venv
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Run training (TO BE IMPLEMENTED)
+python training/train.py
+```
+
+## Expected Output
+
+- Trained model saved in `trained_models/`
+- Training metrics and logs
+- Model performance reports
+- Visualizations and plots
+
+## Notes
+
+- All functions are currently raising `NotImplementedError`
+- Implement functions based on your specific ML problem
+- Follow best practices for ML pipelines
+- Version your models and track metrics
+- Document data schema and model assumptions
