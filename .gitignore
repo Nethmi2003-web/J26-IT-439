@@ -1,0 +1,47 @@
+# Node
+node_modules/
+client/dist/
+npm-debug.log*
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.venv/
+venv/
+env/
+.ipynb_checkpoints/
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Data and model artifacts
+/ml-service/data/raw/*
+/ml-service/data/interim/*
+/ml-service/data/processed/*
+/ml-service/data/external/*
+/ml-service/artifacts/models/*
+/ml-service/artifacts/predictions/*
+
+# Reports and generated output
+/ml-service/reports/figures/*
+/ml-service/reports/experiments/*
+
+# Uploaded images
+/server/uploads/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDEs
+.vscode/
+.idea/
+
+# Build artifacts
+build/
+dist/
+*.egg-info/

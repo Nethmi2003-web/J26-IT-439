@@ -1,0 +1,40 @@
+# Core data science
+numpy
+pandas
+scikit-learn
+scipy
+statsmodels
+xgboost
+
+# Geospatial analysis
+geopandas
+shapely
+rasterio
+folium
+pyproj
+
+# Computer vision
+opencv-python
+torch
+tensorflow
+albumentations
+
+# Visualization
+matplotlib
+seaborn
+plotly
+
+# Experiment tracking and tooling
+mlflow
+python-dotenv
+
+# Testing
+pytest
+
+# Database (PostgreSQL)
+sqlalchemy
+psycopg[binary]
+
+# Model serving API (called by the Express server)
+fastapi
+uvicorn[standard]

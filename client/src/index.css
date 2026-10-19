@@ -1,0 +1,53 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-neutral-100 font-sans text-neutral-900 antialiased;
+    overflow-x: hidden;
+  }
+
+  /* Inputs at 16px stop iOS from zooming on focus. */
+  input,
+  select,
+  textarea {
+    font-size: 16px;
+  }
+
+  :focus-visible {
+    @apply outline-none ring-2 ring-primary-400 ring-offset-2;
+  }
+}
+
+@layer components {
+  .page {
+    @apply space-y-4 sm:space-y-6;
+  }
+
+  .page-title {
+    @apply text-2xl font-bold tracking-tight text-neutral-900 sm:text-3xl lg:text-4xl;
+  }
+
+  .section-title {
+    @apply text-lg font-semibold text-neutral-900 sm:text-xl;
+  }
+
+  .caption {
+    @apply text-xs text-neutral-700 sm:text-sm;
+  }
+
+  .select {
+    @apply min-h-[44px] w-full rounded-sm border border-neutral-200 bg-white px-3 text-neutral-900 sm:w-auto;
+  }
+}
+
+/* Recharts: keep focus outlines off SVG wrappers. */
+.recharts-wrapper:focus,
+.recharts-surface:focus {
+  outline: none;
+}
