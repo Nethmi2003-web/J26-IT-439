@@ -1,30 +1,18 @@
 {
-  "name": "mern-ml-app",
-  "version": "0.1.0",
-  "description": "MERN Stack with Python ML Service",
-  "private": true,
+  "name": "coconutrisk-ai-component-03",
+  "version": "1.0.0",
+  "description": "Component 03: Water Stress, Drought and Future Forecast Risk Modelling for CoconutRisk AI",
   "scripts": {
-    "dev": "concurrently \"npm run frontend\" \"npm run backend\"",
-    "build": "npm run build:frontend && npm run build:backend",
+    "start:ml": "python ml-service/app/main.py",
+    "start:api": "node api/src/app.js",
+    "start:frontend": "cd frontend && npm run dev",
     "build:frontend": "cd frontend && npm run build",
-    "build:backend": "cd backend && npm run build",
-    "frontend": "cd frontend && npm run dev",
-    "backend": "cd backend && npm run dev",
-    "start": "cd backend && npm start",
-    "install:all": "npm install && cd frontend && npm install && cd ../backend && npm install"
+    "train:all": "python ml-service/training/train_all.py",
+    "test:ml": "python -m pytest ml-service/tests/test_c3_ml.py -v",
+    "test:api": "cd api && npm test",
+    "test:all": "python -m pytest ml-service/tests/test_c3_ml.py -v && cd api && npm test"
   },
-  "keywords": [
-    "MERN",
-    "Machine Learning",
-    "React",
-    "Node.js",
-    "MongoDB",
-    "Python",
-    "FastAPI"
-  ],
-  "author": "",
-  "license": "ISC",
-  "devDependencies": {
-    "concurrently": "^8.2.0"
-  }
+  "keywords": ["drought", "spi-3", "coconut", "pytorch", "xgboost", "time-series"],
+  "author": "CoconutRisk AI Research Team",
+  "license": "UNLICENSED"
 }

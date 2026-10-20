@@ -1,25 +1,23 @@
-# Use official Python runtime as base image
-FROM python:3.11-slim
+FROM python:3.10-slim
 
-# Set working directory
 WORKDIR /app
 
-# Install system dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    gcc \
+    build-essential \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy requirements file
-COPY requirements.txt .
-
-# Install Python dependencies
+COPY ml-service/requirements.txt /app/requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy application code
-COPY . .
+COPY ml-service /app/ml-service
+COPY research-data /app/research-data
 
-# Expose port
-EXPOSE 8000
+ENV PYTHONPATH=/app/ml-service
+ENV PORT=8001
+ENV C3_DATA_DIR=/app/research-data
+ENV C3_MODEL_DIR=/app/ml-service/saved_models
 
-# Run the application
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+EXPOSE 8001
+
+CMD ["python", "ml-service/app/main.py"]
