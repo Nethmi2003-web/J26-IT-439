@@ -1,611 +1,156 @@
-# MERN Stack + Python ML Service
+# CoconutRisk AI — Component 03: Water Stress, Drought and Future Forecast Risk Modelling
 
-A complete, production-ready project skeleton for a full-stack application combining:
-- **React** frontend with Vite and TypeScript
-- **Node.js/Express** backend with TypeScript
-- **MongoDB** database
-- **Python FastAPI** machine learning microservice
+> **MANDATORY SCIENTIFIC & DATA DISCLAIMER**  
+> **100% SYNTHETIC RESEARCH SIMULATION:** The accompanying 1981–2025 meteorological time-series dataset (525,952 daily records, 17,280 monthly history records, and 9,600 forecasting ML rows) is a computer-generated stochastic simulation. It is **NOT** observed weather from the Department of Meteorology of Sri Lanka or CRI. The 0.1° demonstration grid cells in `coconut_grid.geojson` are illustrative polygons centered near reference towns, **NOT** certified coconut plantation boundaries. The latest observation is fixed as of **December 2025 (Historical Demo)**. All forecasts are relative to this baseline. Never use for actual agricultural advisories or physical disaster warnings.
 
-This is a clean project scaffold with no business logic implemented - ready for you to build upon.
+---
 
-## 📋 Project Overview
+## Architecture Overview
 
-This project demonstrates a modern full-stack architecture where:
-- React frontend communicates ONLY with the Node.js backend
-- Node.js backend communicates with MongoDB and the Python ML service
-- Python ML service provides machine learning capabilities via REST API
-- All services are containerized with Docker
+Component 03 is an end-to-end production-shaped research prototype composed of three interconnected tiers:
 
-## 🏗 Architecture
-
-```
-┌─────────────────────────────────────────────┐
-│           React Frontend                    │
-│     (Vite + TypeScript + Tailwind)          │
-│           http://localhost:5173             │
-└────────────────┬────────────────────────────┘
-                 │ HTTP/Axios (CORS-enabled)
-                 ↓
-┌─────────────────────────────────────────────┐
-│      Node.js/Express Backend                │
-│      (TypeScript + Mongoose)                │
-│         http://localhost:5000               │
-└────────────────┬──────────────┬─────────────┘
-                 │              │
-         HTTP/Axios        HTTP/Axios
-                 ↓              ↓
-        ┌──────────────┐  ┌──────────────────┐
-        │   MongoDB    │  │  Python FastAPI  │
-        │ :27017       │  │  ML Service      │
-        │              │  │ :8000            │
-        └──────────────┘  └──────────────────┘
+```text
+coconutrisk-ai/
+├── frontend/               # React 18 + Vite + Tailwind CSS + Recharts + Leaflet
+├── api/                    # Node.js 20+ Express Gateway + PostgreSQL (pg pool)
+├── ml-service/             # Python 3.10+ FastAPI + PyTorch (LSTM, GRU, TCN) + XGBoost
+├── research-data/          # Simulated environmental daily & monthly datasets + GeoJSON
+├── scripts/                # Smoke tests and pipeline orchestrators
+└── docs/                   # API contract, architecture, and integration guide
 ```
 
-## 🚀 Tech Stack
+- **Frontend (`:5173`):** React 18 SPA with 7 dedicated pages (`C3Overview`, `C3Dashboard`, `C3RiskMap`, `C3Forecast`, `C3ModelComparison`, `C3Alerts`, `C3Reports`), real-time Leaflet map, Recharts time-series with 90% conformal bands, and responsive layouts (375px mobile, 768px tablet, 1440px desktop).
+- **API Gateway (`:8000`):** Node.js Express server routing `/api/v1/c3/*` to internal ML service, managing PostgreSQL persistence for alert dismissals, custom thresholds, and report jobs, with graceful fallback to read-only demonstration mode when PostgreSQL is offline.
+- **ML Service (`:8001`):** Python FastAPI engine serving real model inference, validation-calibrated split conformal intervals (90% nominal coverage), and on-demand PDF/CSV report generation.
 
-### Frontend
-- **React 18**: UI framework
-- **Vite**: Lightning-fast build tool and dev server
-- **TypeScript**: Type-safe development
-- **Tailwind CSS**: Utility-first CSS framework
-- **React Router**: Client-side routing
-- **Axios**: HTTP client
+---
 
-### Backend
-- **Node.js**: JavaScript runtime
-- **Express**: Web framework
-- **TypeScript**: Type-safe development
-- **Mongoose**: MongoDB ODM
-- **Cors**: Cross-origin resource sharing
-- **Helmet**: Security middleware
-- **Axios**: HTTP client for ML service
+## Quick Start (Local Development)
 
-### Database
-- **MongoDB**: NoSQL database
+### 1. Prerequisites
+- **Node.js:** v20.0+ (Tested on Node v22)
+- **Python:** 3.10+ with `torch`, `fastapi`, `uvicorn`, `xgboost`, `scikit-learn`, `reportlab`, `pandas`
+- **PostgreSQL:** Local instance on port `5432` (`localhost:5432`, db: `coconutrisk_c3`) (gracefully operates in in-memory session mode if offline)
 
-### Machine Learning
-- **Python 3.11+**: Programming language
-- **FastAPI**: Modern web framework
-- **Uvicorn**: ASGI server
-- **Pydantic**: Data validation
-- **NumPy**: Numerical computing
-- **Pandas**: Data manipulation
-- **Scikit-learn**: ML algorithms
-- **Joblib**: Model serialization
-
-### DevOps
-- **Docker**: Containerization
-- **Docker Compose**: Multi-container orchestration
-
-## 📁 Folder Structure
-
-```
-project-root/
-├── frontend/                    # React Vite frontend
-│   ├── public/                  # Static assets
-│   ├── src/
-│   │   ├── assets/              # Images, fonts
-│   │   ├── components/          # React components
-│   │   ├── pages/               # Page components
-│   │   ├── layouts/             # Layout components
-│   │   ├── hooks/               # Custom hooks
-│   │   ├── services/            # API services
-│   │   ├── types/               # TypeScript types
-│   │   ├── utils/               # Utilities
-│   │   ├── context/             # React Context
-│   │   ├── routes/              # Route definitions
-│   │   ├── App.tsx              # Main component
-│   │   ├── main.tsx             # Entry point
-│   │   └── index.css            # Global styles
-│   ├── .env.example             # Example env vars
-│   ├── package.json             # Dependencies
-│   ├── tsconfig.json            # TS config
-│   ├── vite.config.ts           # Vite config
-│   ├── tailwind.config.js       # Tailwind config
-│   └── README.md                # Frontend docs
-│
-├── backend/                     # Node.js/Express backend
-│   ├── src/
-│   │   ├── config/              # Configuration
-│   │   │   └── database.ts      # MongoDB connection
-│   │   ├── controllers/         # Request handlers
-│   │   ├── middleware/          # Custom middleware
-│   │   ├── models/              # Mongoose schemas
-│   │   ├── routes/              # API routes
-│   │   │   └── health.ts        # Health endpoint
-│   │   ├── services/
-│   │   │   └── mlService.ts     # ML service client
-│   │   ├── types/               # TypeScript types
-│   │   ├── utils/               # Utilities
-│   │   ├── validators/          # Input validation
-│   │   ├── app.ts               # Express setup
-│   │   └── server.ts            # Server entry
-│   ├── .env.example             # Example env vars
-│   ├── package.json             # Dependencies
-│   ├── tsconfig.json            # TS config
-│   ├── Dockerfile               # Docker image
-│   └── README.md                # Backend docs
-│
-├── ml-service/                  # Python FastAPI service
-│   ├── app/
-│   │   ├── api/                 # API routes
-│   │   ├── models/              # ML models
-│   │   ├── schemas/             # Pydantic schemas
-│   │   │   └── prediction.py    # Prediction models
-│   │   ├── services/            # Business logic
-│   │   ├── utils/               # Utilities
-│   │   └── main.py              # FastAPI app
-│   │
-│   ├── training/                # ML training pipeline
-│   │   ├── dataset/             # Training data
-│   │   ├── preprocessing.py     # Data preprocessing
-│   │   ├── train.py             # Model training
-│   │   ├── evaluate.py          # Model evaluation
-│   │   └── README.md            # Training docs
-│   │
-│   ├── trained_models/          # Saved models
-│   ├── requirements.txt         # Dependencies
-│   ├── .env.example             # Example env vars
-│   ├── Dockerfile               # Docker image
-│   └── README.md                # ML service docs
-│
-├── uploads/                     # File uploads
-├── .gitignore                   # Git ignore rules
-├── .env.example                 # Example env vars
-├── docker-compose.yml           # Docker Compose config
-├── package.json                 # Root scripts
-└── README.md                    # This file
-```
-
-## 📦 Prerequisites
-
-### For local development without Docker:
-- **Node.js** (v16+) and npm
-- **Python** (3.11+) with pip
-- **MongoDB** (running on localhost:27017)
-
-### For Docker deployment:
-- **Docker** (20.10+)
-- **Docker Compose** (2.0+)
-
-## 🔧 Installation
-
-### 1. Clone/Set Up the Project
-
-```bash
-cd J26-IT-439
-```
-
-### 2. Copy environment files
-
+### 2. Environment Configuration
+Copy `.env.example` to `.env`:
 ```bash
 cp .env.example .env
-cp frontend/.env.example frontend/.env
-cp backend/.env.example backend/.env
-cp ml-service/.env.example ml-service/.env
 ```
 
-### 3. Install root dependencies
-
+### 3. Run Automated Model Training Pipeline
+Train all 24 models (Persistence, Climatology, SARIMAX, XGBoost, Random Forest, LSTM, GRU, TCN) across horizons 1M, 3M, and 6M, compute conformal quantiles, run ablation studies, and save checkpoints:
 ```bash
-npm install
+python ml-service/training/train_all.py
 ```
 
-This installs `concurrently` for running multiple services.
-
-## 🏃 Running Locally
-
-### Option 1: Run all services together
-
+### 4. Run Automated Smoke Tests & Unit Tests
 ```bash
-# From root directory
-npm run dev
+# Python End-to-End System Smoke Test
+python scripts/smoke_test.py
+
+# Python ML Service PyTest Suite (11 tests)
+python -m pytest ml-service/tests/test_c3_ml.py -v
+
+# Node.js Express Gateway Jest Tests (6 tests)
+cd api && npm test
 ```
 
-This starts the frontend and backend together using concurrently.
+### 5. Launch Services
 
-For the ML service, open another terminal:
-
+#### Terminal 1: Python ML Service (Port 8001)
 ```bash
 cd ml-service
-python -m venv .venv
-source .venv/bin/activate  # On Windows: .venv\Scripts\activate
-pip install -r requirements.txt
-uvicorn app.main:app --reload --port 8000
+python app/main.py
+# OpenAPI documentation available at: http://localhost:8001/docs
 ```
 
-### Option 2: Run each service individually
+#### Terminal 2: Node.js API Gateway (Port 8000)
+```bash
+cd api
+node src/app.js
+# Health endpoint: http://localhost:8000/api/v1/c3/health
+```
 
-**Terminal 1 - Frontend:**
+#### Terminal 3: React Frontend (Port 5173)
 ```bash
 cd frontend
-npm install
 npm run dev
-# Frontend: http://localhost:5173
+# Browser UI available at: http://localhost:5173
 ```
 
-**Terminal 2 - Backend:**
+---
+
+## Docker Deployment (Optional)
+
+Run the entire containerized stack via Docker Compose:
 ```bash
-cd backend
-npm install
-npm run dev
-# Backend: http://localhost:5000
+docker compose up --build
+```
+This boots PostgreSQL (`:5432`), Python ML Service (`:8001`), Node Express Gateway (`:8000`), and Nginx React Frontend (`:5173`).
+
+---
+
+## Empirical Model Benchmark Results
+
+*Measured on untouched held-out simulated test partition (2023–2025, N=1,152 test samples per horizon)*
+
+| Horizon | Model | Architecture | Test MAE | Test RMSE | Drought Recall | Macro F1 | 90% Conformal Coverage | Train Time |
+|:---:|---|---|---:|---:|---:|---:|---:|---:|
+| **1M** | **GRU** (Top Model) | Deep Recurrent Sequence | **0.3625** | **0.4625** | 0.81 | **0.5635** | **92.53%** | 82.2s |
+| **1M** | LSTM | Deep Recurrent Sequence | 0.3681 | 0.4660 | 0.79 | 0.5694 | 92.27% | 62.6s |
+| **1M** | TCN | Temporal Convolutional Network | 0.3751 | 0.4728 | 0.77 | 0.5481 | 91.41% | 71.9s |
+| **1M** | XGBoost | Gradient Boosted Trees | 0.3865 | 0.4871 | 0.78 | 0.5554 | 91.23% | 0.3s |
+| **1M** | Random Forest | Ensemble Decision Trees | 0.4083 | 0.5146 | 0.75 | 0.5512 | 90.02% | 1.1s |
+| **1M** | Persistence | Baseline SPI-3(t) | 0.5076 | 0.6518 | 0.69 | 0.5244 | 91.49% | 0.01s |
+| **1M** | SARIMAX | Autoregressive (1,0,1) | 0.5212 | 0.6679 | 0.52 | 0.3483 | 91.49% | 0.8s |
+| **1M** | Climatology | Seasonal Baseline (SPI~0) | 0.8410 | 1.0598 | 0.00 | 0.1690 | 86.46% | 0.01s |
+| **3M** | **XGBoost** (Top Model) | Gradient Boosted Trees | **0.7008** | **0.8736** | 0.28 | **0.2789** | **90.71%** | 0.3s |
+| **3M** | Random Forest | Ensemble Decision Trees | 0.7013 | 0.8730 | 0.25 | 0.2451 | 91.41% | 0.9s |
+| **3M** | TCN | Temporal Convolutional Network | 0.7079 | 0.8939 | 0.26 | 0.2692 | 90.28% | 81.6s |
+| **3M** | GRU | Deep Recurrent Sequence | 0.7252 | 0.9186 | 0.28 | 0.2876 | 88.89% | 91.2s |
+| **3M** | Persistence | Baseline SPI-3(t) | 0.9585 | 1.1968 | 0.27 | 0.3080 | 90.80% | 0.01s |
+| **6M** | **XGBoost** (Top Model) | Gradient Boosted Trees | **0.7640** | **0.9605** | 0.21 | **0.2125** | **90.71%** | 0.3s |
+| **6M** | Random Forest | Ensemble Decision Trees | 0.7640 | 0.9603 | 0.20 | 0.2065 | 91.58% | 0.9s |
+| **6M** | GRU | Deep Recurrent Sequence | 0.7688 | 0.9657 | 0.20 | 0.2014 | 92.01% | 102.8s |
+| **6M** | Persistence | Baseline SPI-3(t) | 1.1381 | 1.4020 | 0.24 | 0.2428 | 89.32% | 0.01s |
+
+---
+
+## Feature Ablation Analysis (Horizon 1M)
+
+| Experiment Configuration | Input Features | Test MAE | Macro F1 | Key Research Finding |
+|---|:---:|:---:|:---:|---|
+| **Full Model** | 17 | 0.3936 | 0.5556 | Best overall multivariate predictive accuracy |
+| **Without Soil Moisture** | 16 | 0.3934 | 0.5598 | Minimal impact, suggesting proxy redundancy |
+| **Without Rainfall Lags** | 13 | **0.4453** | **0.5319** | **Severe degradation (+0.052 MAE)**; demonstrates critical reliance on lagged rainfall signals |
+| **Without Location Index** | 16 | 0.3940 | 0.5554 | Mild impact; macro-climatic patterns dominate localized variations |
+
+---
+
+## Inter-Component Host Integration (C1/C2/C4)
+
+To mount Component 03 into the parent CoconutRisk AI platform:
+
+```jsx
+// In Host App Router
+import { C3ModuleRoutes } from './c3-frontend/src/App';
+
+<Route path="c3/*" element={<C3ModuleRoutes layoutMode="host" apiBase="/api/v1/c3" />} />
 ```
 
-**Terminal 3 - ML Service:**
-```bash
-cd ml-service
-python -m venv .venv
-source .venv/bin/activate  # On Windows: .venv\Scripts\activate
-pip install -r requirements.txt
-uvicorn app.main:app --reload --port 8000
-# ML Service: http://localhost:8000
+```javascript
+// In Host Express Server
+const { registerC3Routes } = require('./c3-api/src/app');
+registerC3Routes(hostExpressApp, { prefix: '/api/v1/c3' });
 ```
 
-**Terminal 4 - MongoDB:**
-
-Make sure MongoDB is running on `mongodb://localhost:27017`
-
-### Option 3: Run with Docker Compose
-
-```bash
-# Build and start all services
-docker-compose up --build
-
-# Run in background
-docker-compose up -d
-
-# View logs
-docker-compose logs -f
-
-# Stop services
-docker-compose down
-```
-
-All services will be available at:
-- Frontend: http://localhost:80 (or http://localhost:5173 if not using Docker)
-- Backend: http://localhost:5000
-- ML Service: http://localhost:8000
-- MongoDB: mongodb://localhost:27017
-
-## 🏥 Health Check Endpoints
-
-### Backend Health
-```
-GET http://localhost:5000/api/health
-```
-
-Response:
-```json
-{
-  "success": true,
-  "message": "Backend is running",
-  "timestamp": "2024-01-01T12:00:00Z",
-  "mlService": "available"
-}
-```
-
-### ML Service Health
-```
-GET http://localhost:8000/api/ml/health
-```
-
-Response:
-```json
-{
-  "success": true,
-  "message": "ML service is running"
-}
-```
-
-## 📚 API Documentation
-
-### Backend API
-
-Access Swagger UI at: `http://localhost:5000` (when implemented)
-
-### ML Service API
-
-Access Swagger UI at: `http://localhost:8000/docs`
-
-Alternative Redoc: `http://localhost:8000/redoc`
-
-## Environment Variables
-
-### Root (.env)
-```
-MONGODB_URI=mongodb://localhost:27017/project_database
-BACKEND_PORT=5000
-BACKEND_URL=http://localhost:5000
-CLIENT_URL=http://localhost:5173
-ML_SERVICE_URL=http://localhost:8000
-NODE_ENV=development
-```
-
-### Frontend (frontend/.env)
-```
-VITE_API_URL=http://localhost:5000/api
-```
-
-### Backend (backend/.env)
-```
-PORT=5000
-MONGODB_URI=mongodb://localhost:27017/project_database
-ML_SERVICE_URL=http://localhost:8000
-NODE_ENV=development
-```
-
-### ML Service (ml-service/.env)
-```
-PORT=8000
-ML_MODEL_PATH=./trained_models
-DEBUG=True
-```
-
-## 📖 Project Documentation
-
-Each service has its own comprehensive README:
-
-- [Frontend Documentation](frontend/README.md)
-- [Backend Documentation](backend/README.md)
-- [ML Service Documentation](ml-service/README.md)
-- [ML Training Guide](ml-service/training/README.md)
-
-## 🔄 Frontend ↔ Backend Communication
-
-The frontend communicates with the backend exclusively through Axios:
-
-```typescript
-// frontend/src/services/api.ts
-const apiClient: AxiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_API_URL,
-  timeout: 10000,
-})
-```
-
-Example:
-```typescript
-// In a React component
-const response = await apiClient.get('/health')
-```
-
-## 🔄 Backend ↔ ML Service Communication
-
-The backend communicates with the ML service via Axios:
-
-```typescript
-// backend/src/services/mlService.ts
-export const checkMLServiceHealth = async () => {
-  const response = await axios.get(`${ML_SERVICE_URL}/api/ml/health`)
-}
-```
-
-## 🐳 Docker Deployment
-
-### Services
-
-- **MongoDB**: Official mongo:7.0 image
-- **Backend**: Custom Node.js image
-- **Frontend**: Multi-stage build with Nginx
-- **ML Service**: Custom Python 3.11 image
-
-### Networks
-
-All services communicate via a Docker bridge network named `mern_network`.
-
-### Volumes
-
-- `mongodb_data`: MongoDB data persistence
-- `mongodb_config`: MongoDB configuration
-
-### Building Images
-
-```bash
-# Build all images
-docker-compose build
-
-# Build specific service
-docker-compose build backend
-docker-compose build backend frontend
-docker-compose build ml-service
-```
-
-## 🚀 Available Commands
-
-### Root Level
-
-```bash
-# Install all dependencies
-npm run install:all
-
-# Start development (frontend + backend)
-npm run dev
-
-# Build all services
-npm run build
-
-# Build frontend
-npm run build:client
-
-# Build backend
-npm run build:server
-
-# Start frontend dev server
-npm run client
-
-# Start backend dev server
-npm run server
-```
-
-### Frontend
-
-```bash
-cd frontend
-npm run dev      # Development
-npm run build    # Production build
-npm run preview  # Preview production build
-npm run lint     # Linting
-```
-
-### Backend
-
-```bash
-cd backend
-npm run dev      # Development
-npm run build    # Compile TypeScript
-npm run start    # Production
-npm run lint     # Linting
-```
-
-### ML Service
-
-```bash
-cd ml-service
-python -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-uvicorn app.main:app --reload --port 8000
-```
-
-## ✅ Project Status
-
-✓ Folder structure created
-✓ React Vite frontend configured
-✓ Node.js Express backend configured
-✓ Python FastAPI ML service scaffolded
-✓ MongoDB connection prepared
-✓ Docker containerization setup
-✓ Environment configuration files
-✓ Health check endpoints
-✓ Frontend ↔ Backend communication ready
-✓ Backend ↔ ML Service communication ready
-
-❌ Business logic NOT implemented
-❌ ML model NOT trained
-❌ Actual predictions NOT implemented
-❌ Authentication NOT implemented
-❌ Database schemas NOT created
-
-## 🎯 Next Steps
-
-### 1. Development Database
-- Ensure MongoDB is running locally
-- Configure `MONGODB_URI` in `.env` files
-
-### 2. Install Dependencies
-
-```bash
-# Install all dependencies
-npm run install:all
-
-# Install ML service dependencies
-cd ml-service
-python -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-```
-
-### 3. Start Development
-
-```bash
-npm run dev
-```
-
-### 4. Verify Setup
-
-Visit:
-- Frontend: http://localhost:5173
-- Backend API: http://localhost:5000/api/health
-- ML Service Docs: http://localhost:8000/docs
-
-### 5. Implement Features
-
-- Create database models in `backend/src/models/`
-- Create API endpoints in `backend/src/routes/`
-- Implement controllers in `backend/src/controllers/`
-- Add React components in `frontend/src/components/`
-- Implement ML training in `ml-service/training/`
-- Implement ML API endpoints in `ml-service/app/`
-
-## 📝 Important Notes
-
-### Security
-- This scaffold uses permissive CORS settings for development
-- Restrict CORS origins in production
-- Never commit `.env` files with secrets
-- Use `.env.example` for safe defaults
-
-### Database
-- MongoDB connection is handled gracefully
-- Connection errors don't crash the app
-- Health checks show MongoDB status
-
-### ML Service
-- The backend health endpoint doesn't fail if ML service is unavailable
-- ML service unavailability is reported in the health response
-- All endpoints return "Not implemented yet" - add your logic here
-
-### TypeScript
-- Strict mode enabled for maximum type safety
-- Path aliases configured for cleaner imports
-
-## 🤝 Contributing
-
-This is a project skeleton meant for team development. Each team member can focus on their domain:
-- Frontend developer → `frontend/`
-- Backend developer → `backend/`
-- ML engineer → `ml-service/`
-
-## 📄 License
-
-ISC
-
-## 🆘 Troubleshooting
-
-### Port Already in Use
-```bash
-# Find process using port 5173
-lsof -i :5173
-
-# Find process using port 5000
-lsof -i :5000
-
-# Find process using port 8000
-lsof -i :8000
-```
-
-### MongoDB Connection Error
-Ensure MongoDB is running:
-```bash
-# Start MongoDB
-mongod
-
-# Or use Docker
-docker run -d -p 27017:27017 --name mongodb mongo:7.0
-```
-
-### Python Virtual Environment
-Make sure to activate the virtual environment:
-```bash
-cd ml-service
-python -m venv .venv
-source .venv/bin/activate  # On Windows: .venv\Scripts\activate
-```
-
-### CORS Errors
-Ensure `VITE_API_URL` in `client/.env` matches your backend URL.
-
-### Docker Issues
-```bash
-# Clear Docker cache
-docker system prune -a
-
-# Rebuild all images
-docker-compose down
-docker-compose build --no-cache
-docker-compose up
-```
-
-## 📞 Support
-
-For questions about specific services, see their respective README files in `frontend/`, `backend/`, and `ml-service/` directories.
+See [docs/INTEGRATION_C1_C2_C4.md](file:///c:/Users/DELL/Downloads/UD%20Reserch%20009%20-%202026/Water_Stress,_Drought_and_Future_Forecast_RiskModelling/docs/INTEGRATION_C1_C2_C4.md) for full details.
+
+---
+
+## Documentation Links
+- [REST API Contract Specification](file:///c:/Users/DELL/Downloads/UD%20Reserch%20009%20-%202026/Water_Stress,_Drought_and_Future_Forecast_RiskModelling/docs/API_CONTRACT.md)
+- [System Architecture & Data Flow](file:///c:/Users/DELL/Downloads/UD%20Reserch%20009%20-%202026/Water_Stress,_Drought_and_Future_Forecast_RiskModelling/docs/ARCHITECTURE.md)
+- [C1/C2/C4 Integration Contract](file:///c:/Users/DELL/Downloads/UD%20Reserch%20009%20-%202026/Water_Stress,_Drought_and_Future_Forecast_RiskModelling/docs/INTEGRATION_C1_C2_C4.md)
+- [Scientific Scope & Data Disclaimer](file:///c:/Users/DELL/Downloads/UD%20Reserch%20009%20-%202026/Water_Stress,_Drought_and_Future_Forecast_RiskModelling/docs/DATA_DISCLAIMER.md)
