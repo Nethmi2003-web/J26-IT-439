@@ -1,0 +1,7 @@
+fastapi
+uvicorn[standard]
+joblib
+pandas
+# The .pkl files were saved with scikit-learn 1.6.1; other versions may
+# load them incorrectly.
+scikit-learn==1.6.1
