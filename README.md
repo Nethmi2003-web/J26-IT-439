@@ -1,105 +1,82 @@
-# AI-Driven Multimodal Coconut Plantation Risk Assessment, Spatial Disease Propagation and Export Forecasting System
+ C1: Multi-Product Coconut Export Volume and Value Forecasting
+📌 Overview
+This repository contains the implementation of Component 1 for the AI-Driven Multimodal Coconut Industry Risk Intelligence System.
 
-A full-stack research platform. It uses **PostgreSQL, Express, React and Node** for the web application and **Python** for model training and serving.
+The primary objective of C1 is to forecast the Export Volume and Export Value for five main coconut products (Coconut Oil, Virgin Coconut Oil (VCO), Desiccated Coconut (DC), Copra, and Fresh Nuts). The system uses advanced Time-Series and Machine Learning models to capture post-2022 macroeconomic shifts and provides an interactive dashboard for exporters and policymakers.
 
-It covers four research components:
+✨ Key Features
+AI-Driven Forecasting: Predicts future export volumes and values for 5 coconut products.
 
-1. Multi-Product Export Forecasting
-2. Coconut Crown Health and Disease Symptom Detection
-3. Water Stress, Drought and Future Forecast Risk Modelling
-4. Spatial Risk Propagation and Hotspot Detection (WCLWD)
+Dual-Feature Dashboard: Toggle between volume (MT) and revenue (Rs. Million) in real-time.
 
-## Architecture
+What-If Scenario Simulator: An interactive UI for users to test macroeconomic shocks (Exchange Rate and Inflation) and see the immediate impact on forecasts.
 
-```text
-React (client, :5173) ──► Express API (server, :5000) ──► PostgreSQL (:5432)
-                                     │                          ▲
-                                     ▼                          │
-                         FastAPI ML service (ml-service, :8000) ┘
-                         (loads trained models, reads training data)
-```
+Microservices Architecture: Fully decoupled Frontend, Backend, and ML Service for high scalability.
 
-- The **client** only talks to the Express API, through the Vite `/api` proxy.
-- The **server** owns the business data in PostgreSQL. It calls the ML service for predictions.
-- The **ml-service** holds all Python research code: training pipelines, notebooks, and a FastAPI app that serves trained models. Training scripts read from and write to the same PostgreSQL database through `src/common/db.py`.
+Zero Data Leakage: Strict chronological split (2018-2022 Train / 2023-2026 Test) ensures realistic evaluation.
 
-## Repository structure
+🛠️ Technology Stack
+Frontend: React.js, Tailwind CSS, Recharts
 
-```text
-research-project/
-├── package.json        # npm workspaces (client + server) and dev scripts
-├── client/             # React + Vite front end
-│   └── src/ (pages/, components/, hooks/, api.js)
-├── server/             # Express + node-postgres API
-│   ├── src/ (app.js, index.js, config/, routes/)
-│   └── scripts/initDb.js
-├── database/           # PostgreSQL schema.sql and seed.sql
-├── ml-service/         # Python: training + model serving
-│   ├── api/main.py     # FastAPI app
-│   ├── src/            # component packages (component_1 … component_4, common, integration)
-│   ├── configs/ data/ notebooks/ tests/ artifacts/ reports/ scripts/
-│   ├── requirements.txt
-│   └── pyproject.toml
-└── docs/               # architecture, methodology, evaluation, data dictionary
-```
+Backend: Node.js, Express.js
 
-## Prerequisites
+Machine Learning / API: Python, FastAPI, Statsmodels (SARIMAX), XGBoost, Scikit-learn
 
-- Node.js 20+
-- Python 3.10–3.12
-- PostgreSQL 14+ (needs to be running locally)
+Database: PostgreSQL (via pg)
 
-## Setup
+🧠 Machine Learning Models
+The system evaluates three models per product to find the most accurate forecaster:
 
-### 1. Database
+SARIMAX (Primary Model): Chosen for its ability to handle seasonality and exogenous variables (Inflation, Exchange Rate, Global Prices) with high extrapolation accuracy.
 
-Create an empty database, for example with pgAdmin or `psql`:
+XGBoost (Baseline): Used to compare machine learning performance.
 
-```sql
-CREATE DATABASE coconut_research;
-```
+Hybrid Model: Combines SARIMAX and XGBoost residuals.
 
-### 2. Node (server + client)
+📊 Performance Metrics
+SARIMAX MAPE: ~2.1% (Forecast Accuracy ~97.9%)
 
-From the project root:
+XGBoost MAPE: ~15.9%
 
-```bat
-npm install
-copy server\.env.example server\.env
-```
+📂 Folder Structure
+text
+c1-export-forecasting/
+├── scripts/                 # Python ML Pipeline & API
+│   ├── 01_data_prep.py      # Preprocessing & Feature Engineering
+│   ├── 02_train_models.py   # Model Training (SARIMAX, XGBoost)
+│   ├── 03_evaluate.py       # Evaluation & Graph Generation
+│   ├── 04_api.py            # FastAPI ML Service (Forecast & What-If)
+│   └── process_export_data.py 
+├── data/                    # Processed CSV datasets (master_export_data.csv)
+├── models/                  # Saved models (.pkl and .json)
+├── outputs/                 # Evaluation metrics and forecast charts
+└── server/                  # Node.js Backend
+    ├── server.js            # Express API routes
+    └── seed.js              # Database seeding script
+🚀 How to Run Locally
+This project requires 3 separate terminals to run the full microservices architecture.
 
-Edit `server\.env` and set `DATABASE_URL` to your PostgreSQL username and password. Then create the tables:
+1. Python ML Service (Terminal 1)
+bash
+cd ml-service/c1-export-forecasting
+python scripts/04_api.py
+# Runs on http://localhost:8000
+2. Node.js Backend (Terminal 2)
+bash
+cd server
+node server.js
+# Runs on http://localhost:5000
+3. React Frontend (Terminal 3)
+bash
+cd client
+npm run dev
+# Runs on http://localhost:5173
+🔗 API Endpoints (Node.js Backend)
+Method	Endpoint	Description
+GET	/api/history/:product	Fetches historical export data from PostgreSQL
+GET	/api/forecast/:product?months=6	Calls the Python ML API to get future forecasts
+POST	/api/what-if	Passes user-adjusted macroeconomic variables to the ML simulator
+🗄️ Database Schema (PostgreSQL)
+historical_export_data: Stores date, product, volume, value, and macro variables.
 
-```bat
-npm run db:init
-```
-
-### 3. Python ML service
-
-```bat
-cd ml-service
-python -m venv .venv
-.venv\Scripts\activate
-pip install -r requirements.txt
-copy .env.example .env
-cd ..
-```
-
-Note: `torch` and `tensorflow` are large downloads. Comment them out in `requirements.txt` if you do not need them yet.
-
-## Running
-
-Open two terminals in the project root:
-
-```bat
-npm run dev       :: Express (5000) + React (5173)
-npm run dev:ml    :: FastAPI ML service (8000)
-```
-
-Open http://localhost:5173. The Overview page shows whether the API, the database and the ML service are reachable.
-
-## Research boundaries
-
-- Component 2 uses visible symptom data only and should not be treated as a direct diagnosis.
-- Component 3 models environmental risk and should not be interpreted as direct palm-level physiological measurements.
-- Component 4 treats wind as a potential spread proxy until domain experts validate it.
+export_forecasts: Stores AI-generated forecasts for audit and history.
