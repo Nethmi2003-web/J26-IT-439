@@ -1,30 +1,14 @@
 {
-  "name": "mern-ml-app",
-  "version": "0.1.0",
-  "description": "MERN Stack with Python ML Service",
+  "name": "coconut-ml-server",
   "private": true,
   "scripts": {
-    "dev": "concurrently \"npm run frontend\" \"npm run backend\"",
-    "build": "npm run build:frontend && npm run build:backend",
-    "build:frontend": "cd frontend && npm run build",
-    "build:backend": "cd backend && npm run build",
-    "frontend": "cd frontend && npm run dev",
-    "backend": "cd backend && npm run dev",
-    "start": "cd backend && npm start",
-    "install:all": "npm install && cd frontend && npm install && cd ../backend && npm install"
+    "start": "node server.js",
+    "db:init": "node scripts/db-init.js"
   },
-  "keywords": [
-    "MERN",
-    "Machine Learning",
-    "React",
-    "Node.js",
-    "MongoDB",
-    "Python",
-    "FastAPI"
-  ],
-  "author": "",
-  "license": "ISC",
-  "devDependencies": {
-    "concurrently": "^8.2.0"
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "pg": "^8.23.1"
   }
 }
